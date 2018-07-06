@@ -1,0 +1,7 @@
+      {
+         "label"         : "test_vcf2",
+         "storeClass"    : "JBrowse/Store/SeqFeature/VCFTabix",
+         "urlTemplate"   : "../uploads/volvox_filtered.vcf.gz",
+         "type"          : "JBrowse/View/Track/HTMLVariants"
+      }
+]}

@@ -1,0 +1,59 @@
+# NCGAS Tripal Extension - Popup JBrowse
+Prerequisites: 
+1) JBrowse
+2) Samtools
+3) Bioperl/bio samtools
+
+Installing Prerequisites (Ubuntu):
+1) JBrowse:
+follow instructions here: https://jbrowse.org/install/
+you can install it anywhere you’d like, the default assumption in the module is /var/www/html/jbrowse
+
+2)Samtools:
+see http://www.htslib.org/download/
+
+3) Bioperl/bio samtools:
+sudo apt-get install bioperl
+
+wget https://cpan.metacpan.org/authors/id/L/LD/LDS/Bio-SamTools-1.43.tar.gz
+tar xfv Bio-SamTools-1.43.tar.gz
+rm Bio-SamTools-1.43.tar.gz
+
+wget https://sourceforge.net/projects/module-build/files/latest/download
+mv download Module-Build.tar.gz
+tar xfv Module-Build.tar.gz
+rm Module-Build.tar.gz
+cd Module-Build-0.2808/
+sudo perl Build.PL 
+sudo ./Build test
+sudo ./Build install
+
+cd ..
+cd Bio-SamTools-1.43/
+perl INSTALL.pl 
+
+Installation and Configuration:
+1) unpack the module into /sites/all/modules
+2) go to module menu and enable the module
+3) go to the module menu and click configuration
+4) enter the absolute path (starting with root /) to the JBrowse installation, the default being /var/www/html/jbrowse/
+5) enter the name of the JBrowse installation directory, which defaults to jbrowse.  If you did not change it when you installed it, it may be JBrowse-1.12.3, etc.  
+6) Save configuration
+
+Set Permissions:
+1) go to people menu
+2) click the permissions tab
+3) scroll to popupjb
+4) set the permissions for access to the three functions, add a reference/load a track/delete a track.  Suggested use would be locking reference loading and track removal to admins and track loading to authorized users only.
+
+Use:
+Three pages are available in the module:
+/popupjb_ref	
+	- allows you to upload a .fa or .fasta file as a reference file as well as name the reference
+/popupjb_track 
+	- allows you to upload .bam/.gff/.gff3/.bed/.vcf/.gbk files against a preloaded reference and 	name the tracks.
+	- this does allow access to ANY open preloaded jbrowse.  If there is a jbrowse you do not want 	to be modified, you can easily change the permissions of that directory to not be writable by 	apache/www-data
+/popupjb_delete
+	- allows you to delete uploaded tracks for clean up, etc.
+
+Notes:  File types are checked at upload, upload max is set in php.ini

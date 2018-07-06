@@ -1,0 +1,7 @@
+      {
+         "label"         : "LABEL",
+         "storeClass"    : "JBrowse/Store/SeqFeature/VCFTabix",
+         "urlTemplate"   : "../uploads/FILENAME.gz",
+         "type"          : "JBrowse/View/Track/HTMLVariants"
+      }
+]}

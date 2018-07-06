@@ -1,0 +1,10 @@
+name = popupjb
+description = List recent publications on coffee from Pubmed via Eutils and JS http requests.
+core = 7.x
+files[] = popupjb.module
+
+package = NCGAS
+;dependencies[] = 
+;dependencies[] = 
+;files[] = 
+configure = admin/config/content/popupjb

@@ -1,0 +1,275 @@
+<?php
+// $Id$
+//  Module: popupjb
+// Sheri Sanders
+// 2017 Nov 22
+
+/**
+ * Implements hook_help().
+ *
+ * Displays help and module information.
+ *
+ * @param path 
+ *   Which path of the site we're using to display help
+ * @param arg 
+ *   Array that holds the current path as returned from arg() function
+ */
+
+/**
+ * Implements hook_permission().
+ */
+
+function popupjb_permission() {
+   return array(
+      'access popupjb ref' => array(
+	 'title' => t('Access reference loading for Pop Up JB module'),
+      ),
+      'access popupjb add' => array(
+	 'title' => t('Access track loading for Pop Up JB module'),
+      ),
+      'access popupjb del' => array(
+	 'title' => t('Access track deleting for Pop Up JB module'),
+      ),
+      'access popupjb makeblast' => array(
+	 'title' => t('Access BLAST uploading for Pop Up JB module'),
+      )
+  );
+}
+
+
+/**
+ * Implements hook_menu().
+ */
+
+function popupjb_menu() {
+  $items = array();
+  $items['admin/config/content/popupjb'] = array(
+    'title' => 'PopUpJB',
+    'description' => 'Configuration for PopUpJB module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('popupjb_form'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['popupjb_ref'] = array( //this creates a URL
+    'title' => 'Load a New JBrowse Reference', //page title
+    'description' => 'Spawn a new JBrowse reference with a GUI.',
+    'page callback' => 'popupjb_refpage_callback', //this function called when page accessed. For form, use drupal_get_form
+    'access callback' => TRUE,
+    'access arguments' => array('access popupjb ref'),
+  );
+  $items['popupjb_refloaded'] = array( //this creates a URL
+    'title' => 'Reference Load Status', //page title
+    'description' => 'Added reference from a GUI.',
+    'page callback' => 'popupjb_refloaded_callback', //this function called when page accessed. For form, use drupal_get_form
+    'access callback' => TRUE,
+    'access arguments' => array('access popupjb ref'),
+  );
+  $items['popupjb_track'] = array( //this creates a URL
+    'title' => 'Load a New JBrowse Track', //page title
+    'description' => 'Add tracks to a JBrowse reference from a GUI.',
+    'page callback' => 'popupjb_trackpage_callback', //this function called when page accessed. For form, use drupal_get_form
+    'access callback' => TRUE,
+    'access arguments' => array('access popupjb add'),
+  );
+  $items['popupjb_trackloaded'] = array( //this creates a URL
+    'title' => 'Track Load Status', //page title
+    'description' => 'Added tracks to a JBrowse reference from a GUI.',
+    'page callback' => 'popupjb_trackloaded_callback', //this function called when page accessed. For form, use drupal_get_form
+    'access callback' => TRUE,
+    'access arguments' => array('access popupjb add'),
+  );
+   $items['popupjb_delete'] = array( //this creates a URL
+    'title' => 'Remove a JBrowse Track', //page title
+    'description' => 'Remove tracks to a JBrowse reference from a GUI.',
+    'page callback' => 'popupjb_delpage_callback', //this function called when page accessed. For form, use drupal_get_form
+    'access callback' => TRUE,
+    'access arguments' => array('access popupjb del'),
+  );
+  $items['popupjb_deleted'] = array( //this creates a URL
+    'title' => 'Removal Status', //page title
+    'description' => 'Removed tracks to a JBrowse reference from a GUI.',
+    'page callback' => 'popupjb_deleted_callback', //this function called when page accessed. For form, use drupal_get_form
+    'access callback' => TRUE,
+    'access arguments' => array('access popupjb del'),
+  );
+   $items['popupjb_makeblastdb'] = array( //this creates a URL
+    'title' => 'Add a BLAST Database', //page title
+    'description' => 'Add BLAST database and link it to JBrowse from a GUI.',
+    'page callback' => 'popupjb_makeblastdb_callback', //this function called when page accessed. For form, use drupal_get_form
+    'access callback' => TRUE,
+    'access arguments' => array('access popupjb makeblast '),
+  );
+  $items['popupjb_madedb'] = array( //this creates a URL
+    'title' => 'BLAST DB Status', //page title
+    'description' => 'Added BLAST database from a GUI.',
+    'page callback' => 'popupjb_madedb_callback', //this function called when page accessed. For form, use drupal_get_form
+    'access callback' => TRUE,
+    'access arguments' => array('access popupjb makeblast '),
+  );
+  
+  return $items;
+}
+
+
+/**
+ * Implements hook_theme().
+ */
+
+function popupjb_theme() {
+  return array(
+    'popupjb_refpage_template' => array(  // this array name to be used in theme()
+    'template' => 'popupjb_refpage',  //,  template file lis_citations_page.tpl.php
+    ),  //array page_template
+    'popupjb_refloaded_template' => array(  // this array name to be used in theme()
+    'template' => 'popupjb_refloaded',
+    ),  //array page_template
+    'popupjb_trackpage_template' => array(  // this array name to be used in theme()
+    'template' => 'popupjb_trackpage',
+    ),  //array page_template
+    'popupjb_trackloaded_template' => array(  // this array name to be used in theme()
+    'template' => 'popupjb_trackloaded',
+    ),  //array page_template
+    'popupjb_delpage_template' => array(  // this array name to be used in theme()
+    'template' => 'popupjb_delpage',
+    ),  //array page_template
+    'popupjb_deleted_template' => array(  // this array name to be used in theme()
+    'template' => 'popupjb_deleted',
+    ),  //array page_template
+    'popupjb_makeblastdb_template' => array(  // this array name to be used in theme()
+    'template' => 'popupjb_makeblastdb',
+    ),  //array page_template
+    'popupjb_madedb_template' => array(  // this array name to be used in theme()
+    'template' => 'popupjb_madedb',
+    ),  //array page_template
+
+  );  // array return
+}    
+
+/**
+ * Implements page callbacks.
+ */
+
+function popupjb_refpage_callback() {
+    return theme ('popupjb_refpage_template'); 
+}
+function popupjb_refloaded_callback() {    
+    $loc = variable_get('popup_jbloc', '/var/www/html/jbrowse/');
+    $loc2 = variable_get('popup_jblocshort', 'jbrowse');
+    return theme ('popupjb_refloaded_template', array('popupjb_jbloc'=>$loc, 'popupjb_jblocshort'=>$loc2)); 
+}
+function popupjb_trackpage_callback() {    
+    return theme ('popupjb_trackpage_template'); 
+}
+function popupjb_trackloaded_callback() {    
+    $loc = variable_get('popup_jbloc', '/var/www/html/jbrowse/');
+    $loc2 = variable_get('popup_jblocshort', 'jbrowse');
+    return theme ('popupjb_trackloaded_template', array('popupjb_jbloc'=>$loc, 'popupjb_jblocshort'=>$loc2)); 
+}
+function popupjb_delpage_callback() {    
+    return theme ('popupjb_delpage_template'); 
+}
+function popupjb_deleted_callback() {    
+    $loc = variable_get('popup_jbloc', '/var/www/html/jbrowse/');
+    $loc2 = variable_get('popup_jblocshort', 'jbrowse');
+    return theme ('popupjb_deleted_template', array('popupjb_jbloc'=>$loc, 'popupjb_jblocshort'=>$loc2)); 
+}
+function popupjb_makeblastdb_callback() {    
+    return theme ('popupjb_makeblastdb_template');
+}
+function popupjb_madedb_callback() {    
+    $loc = variable_get('popup_jbloc', '/var/www/html/jbrowse/');
+    $loc2 = variable_get('popup_jblocshort', 'jbrowse');
+    return theme ('popupjb_madedb_template', array('popupjb_jbloc'=>$loc, 'popupjb_jblocshort'=>$loc2)); 
+}
+
+/**
+ * Config callback: PopUpJB settings
+ *
+ * @see popupjb_menu()
+ */
+function popupjb_form($form, &$form_state) {
+  $form['popupjb_jbloc'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Absolute path to your jbrowse instance (including the jbrowse/ folder)'),
+    '#default_value' => variable_get('popupjb_jbloc', '/var/www/html/jbrowse/'),
+    '#required' => TRUE,
+  );
+  $form['popupjb_jblocshort'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Name of the jbrowse folder'),
+    '#default_value' => variable_get('popupjb_jblocshort','jbrowse'),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}
+
+function popupjb_help($path, $arg) {
+  switch ($path) {
+    case "admin/help#popupjb":
+      return t("Prerequisites: <br>
+1) JBrowse <br>
+2) Samtools<br>
+3) Bioperl/bio samtools<br>
+<br>
+Installing Prerequisites (Ubuntu):<br>
+1) JBrowse:<br>
+follow instructions here: https://jbrowse.org/install/<br>
+you can install it anywhere you’d like, the default assumption in the module is /var/www/html/jbrowse<br>
+<br>
+2)Samtools:<br>
+see http://www.htslib.org/download/<br>
+<br>
+3) Bioperl/bio samtools:<br>
+sudo apt-get install bioperl<br>
+<br>
+wget https://cpan.metacpan.org/authors/id/L/LD/LDS/Bio-SamTools-1.43.tar.gz<br>
+tar xfv Bio-SamTools-1.43.tar.gz<br>
+rm Bio-SamTools-1.43.tar.gz<br>
+
+wget https://sourceforge.net/projects/module-build/files/latest/download<br>
+mv download Module-Build.tar.gz<br>
+tar xfv Module-Build.tar.gz<br>
+rm Module-Build.tar.gz<br>
+cd Module-Build-0.2808/<br>
+sudo perl Build.PL <br>
+sudo ./Build test<br>
+sudo ./Build install<br>
+<br>
+cd ..<br>
+cd Bio-SamTools-1.43/<br>
+perl INSTALL.pl <br>
+
+Installation and Configuration:<br>
+1) unpack the module into /sites/all/modules<br>
+2) go to module menu and enable the module<br>
+3) go to the module menu and click configuration<br>
+4) enter the absolute path (starting with root /) to the JBrowse installation, the default being /var/www/html/jbrowse/<br>
+5) enter the name of the JBrowse installation directory, which defaults to jbrowse.  If you did not change it when you installed it, it may be JBrowse-1.12.3, etc.  <br>
+6) Save configuration<br>
+<br>
+Set Permissions:<br>
+1) go to people menu<br>
+2) click the permissions tab<br>
+3) scroll to popupjb<br>
+4) set the permissions for access to the three functions, add a reference/load a track/delete a track.  Suggested use would be locking reference loading and track removal to admins and track loading to authorized users only.<br>
+<br>
+Use:<br>
+Three pages are available in the module:<br>
+/popupjb_ref	<br>
+	- allows you to upload a .fa or .fasta file as a reference file as well as name the reference<br>
+/popupjb_track <br>
+	- allows you to upload .bam/.gff/.gff3/.bed/.vcf/.gbk files against a preloaded reference and 	name the tracks.<br>
+	- this does allow access to ANY open preloaded jbrowse.  If there is a jbrowse you do not want 	to be modified, you can easily change the permissions of that directory to not be writable by 	apache/www-data<br>
+/popupjb_delete<br>
+	- allows you to delete uploaded tracks for clean up, etc.<br>
+/popupjb_makeblastdb<br>
+	- allows you to upload BLAST databases and link them to jbrowse instances.<br>
+
+<br>
+Notes:  File types are checked at upload, upload max is set in php.ini");
+      break; 
+  }
+}
